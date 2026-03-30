@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英作文添削アプリ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:wght@700;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1208;
+  --parchment: #faf6ef;
+  --cream: #f5ede0;
+  --gold: #b8860b;
+  --gold-light: #d4a843;
+  --red: #8b1a1a;
+  --green: #1a5c2a;
+  --blue-ink: #1a2d5c;
+  --border: #c8b89a;
+  --shadow: rgba(26,18,8,0.15);
+  --score-bg: #fdf9f3;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--parchment);
+  color: var(--ink);
+  min-height: 100vh;
+  background-image: 
+    radial-gradient(ellipse at 20% 50%, rgba(184,134,11,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(139,26,26,0.04) 0%, transparent 50%);
+}
+
+header {
+  background: var(--ink);
+  color: var(--parchment);
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid var(--gold);
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+.header-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  color: var(--gold-light);
+  letter-spacing: 0.02em;
+}
+
+.header-badge {
+  font-size: 0.72rem;
+  color: #c8b89a;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 300;
+  text-align: right;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+/* PRIVACY NOTICE */
+.privacy-notice {
+  background: linear-gradient(135deg, #fff8f0, #fdf3e7);
+  border: 1px solid #e8d5b5;
+  border-left: 4px solid var(--gold);
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 0.8rem;
+  color: #7a5c2a;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.privacy-notice::before { content: '⚠️'; font-size: 1rem; }
+
+/* TOPIC SECTION */
+.topic-section {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+
+.topic-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.topic-label {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--blue-ink);
+  border-bottom: 2px solid var(--blue-ink);
+  padding-bottom: 2px;
+  white-space: nowrap;
+}
+
+.btn-random {
+  background: var(--blue-ink);
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-random:hover { background: #2a4080; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,45,92,0.3); }
+
+.btn-random-label {
+  font-size: 0.68rem;
+  color: #7a8aaa;
+  font-weight: 300;
+  white-space: nowrap;
+}
+
+.topic-display {
+  font-family: 'Lora', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 12px 16px;
+  background: var(--cream);
+  border-radius: 6px;
+  border-left: 4px solid var(--gold);
+  line-height: 1.6;
+  min-height: 48px;
+}
+
+.topic-display.placeholder {
+  color: #aaa;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.95rem;
+}
+
+/* WORD COUNT SECTION */
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.wordcount-label {
+  font-size: 0.85rem;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.wordcount-input {
+  width: 80px;
+  padding: 6px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-family: 'Noto Sans JP', sans-serif;
+  background: white;
+  color: var(--ink);
+  text-align: center;
+}
+
+.wordcount-input:focus { outline: none; border-color: var(--blue-ink); }
+
+/* WRITING AREA */
+.writing-section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--blue-ink);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background: var(--blue-ink);
+  border-radius: 2px;
+}
+
+textarea#essay {
+  width: 100%;
+  min-height: 200px;
+  padding: 16px;
+  font-family: 'Lora', serif;
+  font-size: 1rem;
+  line-height: 1.85;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  color: var(--ink);
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
+}
+
+textarea#essay:focus {
+  outline: none;
+  border-color: var(--blue-ink);
+  box-shadow: 0 0 0 3px rgba(26,45,92,0.1), inset 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.word-counter {
+  text-align: right;
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 6px;
+}
+
+.word-counter.over { color: var(--red); font-weight: 600; }
+
+/* SUBMIT BUTTON */
+.submit-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, var(--red), #6b1212);
+  color: white;
+  border: none;
+  padding: 14px 48px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  transition: all 0.25s;
+  box-shadow: 0 4px 16px rgba(139,26,26,0.35);
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(139,26,26,0.4);
+}
+
+.btn-submit:disabled {
+  background: #ccc;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* LOADING */
+.loading {
+  display: none;
+  text-align: center;
+  padding: 40px;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.loading.active { display: block; }
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e0d5c5;
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* RESULTS */
+.results {
+  display: none;
+  animation: fadeIn 0.5s ease;
+}
+
+.results.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* SCORE CARD */
+.score-card {
+  background: white;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 20px rgba(184,134,11,0.1);
+}
+
+.score-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.score-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  color: var(--ink);
+}
+
+.total-score {
+  text-align: center;
+}
+
+.total-score .num {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.2rem;
+  color: var(--red);
+  line-height: 1;
+}
+
+.total-score .denom {
+  font-size: 1rem;
+  color: #888;
+}
+
+.score-breakdown {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.score-item {
+  background: var(--score-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+}
+
+.score-item .item-label {
+  font-size: 0.78rem;
+  color: #666;
+  margin-bottom: 6px;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.score-item .item-score {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: var(--blue-ink);
+  line-height: 1;
+}
+
+.score-item .item-max {
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
+.score-bar {
+  height: 6px;
+  background: #e5ddd0;
+  border-radius: 3px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--blue-ink), var(--gold));
+  transition: width 1s ease;
+}
+
+/* FEEDBACK SECTIONS */
+.feedback-section {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+
+.fb-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--cream);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fb-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.icon-grammar { background: #fde8e8; color: var(--red); }
+.icon-advice { background: #e8f0fd; color: var(--blue-ink); }
+.icon-model { background: #e8f5ec; color: var(--green); }
+
+.feedback-content {
+  font-size: 0.92rem;
+  line-height: 1.9;
+  color: #333;
+}
+
+.feedback-content .error-item {
+  background: #fff8f0;
+  border: 1px solid #f0dcc0;
+  border-left: 4px solid var(--red);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+
+.error-item .err-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--red);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.error-item .err-wrong {
+  background: #ffe5e5;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: 'Lora', serif;
+  color: var(--red);
+  text-decoration: line-through;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  display: inline-block;
+}
+
+.error-item .err-arrow { color: #888; margin: 0 6px; }
+
+.error-item .err-correct {
+  background: #e6f4ea;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: 'Lora', serif;
+  color: var(--green);
+  font-size: 0.95rem;
+  display: inline-block;
+}
+
+.error-item .err-explain {
+  color: #555;
+  font-size: 0.85rem;
+  margin-top: 6px;
+  line-height: 1.6;
+}
+
+.advice-text {
+  background: #f0f4ff;
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 0.9rem;
+  line-height: 1.9;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+.model-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.model-tab {
+  padding: 7px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+  color: #666;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.model-tab.active {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+}
+
+.model-content {
+  display: none;
+}
+
+.model-content.active { display: block; }
+
+.model-en {
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  line-height: 1.85;
+  color: var(--ink);
+  background: var(--cream);
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid var(--green);
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+}
+
+.model-ja {
+  font-size: 0.83rem;
+  line-height: 1.8;
+  color: #555;
+  padding: 12px 16px;
+  background: #f8f8f8;
+  border-radius: 6px;
+  white-space: pre-wrap;
+}
+
+.model-ja::before {
+  content: '【日本語訳】';
+  display: block;
+  font-weight: 700;
+  color: #333;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+
+.cefl-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.badge-b1 { background: #e8f4fd; color: #1a5c8b; border: 1px solid #a8d5f0; }
+.badge-b2 { background: #e8f5ec; color: #1a5c2a; border: 1px solid #a0d4b0; }
+
+/* API KEY SECTION */
+.api-section {
+  background: #fffdf0;
+  border: 1.5px dashed var(--gold);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+}
+
+.api-section summary {
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--blue-ink);
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.api-section summary::before { content: '🔑'; }
+
+.api-inner {
+  margin-top: 14px;
+}
+
+.api-desc {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 10px;
+  line-height: 1.7;
+}
+
+.api-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.api-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: 'Noto Sans JP', sans-serif;
+  background: white;
+}
+
+.api-input:focus { outline: none; border-color: var(--blue-ink); }
+
+.btn-api-save {
+  padding: 8px 16px;
+  background: var(--blue-ink);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+  transition: background 0.2s;
+}
+
+.btn-api-save:hover { background: #2a4080; }
+
+.api-status {
+  font-size: 0.78rem;
+  margin-top: 8px;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.api-status.ok { background: #e8f5ec; color: var(--green); }
+.api-status.none { background: #fff0e8; color: #b85a1a; }
+
+/* GEMINI LINK SECTION */
+.gemini-section {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+
+.gemini-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gemini-desc {
+  font-size: 0.82rem;
+  color: #666;
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+
+.gemini-btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-gemini {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-gemini-primary {
+  background: linear-gradient(135deg, #4285f4, #1a6bd4);
+  color: white;
+  box-shadow: 0 3px 10px rgba(66,133,244,0.3);
+}
+
+.btn-gemini-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(66,133,244,0.4); }
+
+.btn-gemini-secondary {
+  background: white;
+  color: var(--blue-ink);
+  border: 1.5px solid var(--blue-ink);
+}
+
+.btn-gemini-secondary:hover { background: #f0f4ff; }
+
+.gemini-prompt-box {
+  display: none;
+  margin-top: 14px;
+  background: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.gemini-prompt-box.active { display: block; }
+
+.gemini-prompt-text {
+  font-size: 0.82rem;
+  color: #333;
+  white-space: pre-wrap;
+  line-height: 1.7;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.btn-copy {
+  margin-top: 10px;
+  padding: 7px 14px;
+  background: var(--gold);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+  transition: background 0.2s;
+}
+
+.btn-copy:hover { background: var(--gold-light); }
+
+@media (max-width: 600px) {
+  .score-breakdown { grid-template-columns: 1fr; }
+  .header-title { font-size: 1.2rem; }
+  .model-tabs { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">✍️ 英作文 添削アプリ</div>
+</header>
+
+<div class="container">
+
+  <!-- Privacy Notice -->
+  <div class="privacy-notice">
+    個人情報（氏名・住所・電話番号など）は入力しないようにしましょう。
+  </div>
+
+  <!-- Topic Section -->
+  <div class="topic-section">
+    <div class="topic-header">
+      <span class="topic-label">📌 テーマ</span>
+      <button class="btn-random" onclick="setRandomTopic()">🎲 ランダムなテーマを出題</button>
+    </div>
+    <div class="topic-display placeholder" id="topicDisplay">テーマを入力するか、ランダムボタンで出題してください</div>
+    <input type="text" id="customTopic" placeholder="または、ここにテーマを自由入力..." 
+      style="width:100%;margin-top:12px;padding:9px 14px;border:1.5px solid var(--border);border-radius:6px;font-size:0.9rem;font-family:'Noto Sans JP',sans-serif;background:#fafafa;"
+      oninput="setCustomTopic(this.value)">
+  </div>
+
+  <!-- Settings Row -->
+  <div class="writing-section">
+    <div class="settings-row">
+      <span class="wordcount-label">目標語数：</span>
+      <input type="number" class="wordcount-input" id="wordLimit" value="150" min="50" max="300" step="10">
+      <span class="wordcount-label">語（最大300語）</span>
+    </div>
+
+    <div class="section-title">英作文を入力してください</div>
+    <textarea id="essay" placeholder="ここに英作文を入力してください..." oninput="updateWordCount()"></textarea>
+    <div class="word-counter" id="wordCounter">0 語</div>
+  </div>
+
+  <div class="submit-row">
+    <button class="btn-submit" id="submitBtn" onclick="submitEssay()">✅ Submit（添削する）</button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    添削中です。少々お待ちください…
+  </div>
+
+  <!-- Results -->
+  <div class="results" id="results">
+
+    <!-- Score Card -->
+    <div class="score-card">
+      <div class="score-header">
+        <div class="score-title">📊 採点結果</div>
+        <div class="total-score">
+          <div class="num" id="totalScore">--</div>
+          <div class="denom">/ 100点</div>
+        </div>
+      </div>
+      <div class="score-breakdown">
+        <div class="score-item">
+          <div class="item-label">文法・語法</div>
+          <div class="item-score" id="grammarScore">--</div>
+          <div class="item-max">/ 35点</div>
+          <div class="score-bar"><div class="score-bar-fill" id="grammarBar" style="width:0%"></div></div>
+        </div>
+        <div class="score-item">
+          <div class="item-label">文の構成</div>
+          <div class="item-score" id="structureScore">--</div>
+          <div class="item-max">/ 35点</div>
+          <div class="score-bar"><div class="score-bar-fill" id="structureBar" style="width:0%"></div></div>
+        </div>
+        <div class="score-item">
+          <div class="item-label">論理性</div>
+          <div class="item-score" id="logicScore">--</div>
+          <div class="item-max">/ 30点</div>
+          <div class="score-bar"><div class="score-bar-fill" id="logicBar" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grammar Errors -->
+    <div class="feedback-section">
+      <div class="fb-title">
+        <span class="fb-icon icon-grammar">❌</span>
+        ② 文法・語法のミス指摘
+      </div>
+      <div class="feedback-content" id="grammarFeedback"></div>
+    </div>
+
+    <!-- Advice -->
+    <div class="feedback-section">
+      <div class="fb-title">
+        <span class="fb-icon icon-advice">💡</span>
+        ③ アドバイスと講評
+      </div>
+      <div class="feedback-content">
+        <div class="advice-text" id="adviceText"></div>
+      </div>
+    </div>
+
+    <!-- Model Answers -->
+    <div class="feedback-section">
+      <div class="fb-title">
+        <span class="fb-icon icon-model">📝</span>
+        ④ モデル解答（2パターン）
+      </div>
+      <div class="model-tabs">
+        <button class="model-tab active" onclick="switchModel('b1', this)">CEFR B1レベル</button>
+        <button class="model-tab" onclick="switchModel('b2', this)">CEFR B2レベル</button>
+      </div>
+      <div class="model-content active" id="model-b1">
+        <span class="cefl-badge badge-b1">CEFR B1（英検2〜準1級相当）</span>
+        <div class="model-en" id="modelB1En"></div>
+        <div class="model-ja" id="modelB1Ja"></div>
+      </div>
+      <div class="model-content" id="model-b2">
+        <span class="cefl-badge badge-b2">CEFR B2（英検準1級〜1級相当）</span>
+        <div class="model-en" id="modelB2En"></div>
+        <div class="model-ja" id="modelB2Ja"></div>
+      </div>
+    </div>
+
+  </div><!-- /results -->
+
+</div><!-- /container -->
+
+<script>
+// ===== TOPICS (100+) =====
+const TOPICS = [
+  // 社会・現代
+  "Should students be allowed to use smartphones in class?",
+  "Is social media more harmful than beneficial to young people?",
+  "Should the retirement age be raised to 70?",
+  "Do you think working from home should become the new standard?",
+  "Should plastic bags be completely banned?",
+  "Is it important for everyone to learn a foreign language?",
+  "Do you think zoos should be abolished?",
+  "Should university education be free for all students?",
+  "Is it better to live in a city or in the countryside?",
+  "Should junk food be taxed more heavily?",
+  "Do you think online shopping will replace physical stores?",
+  "Should the voting age be lowered to 16?",
+  "Is it important for companies to hire people from diverse backgrounds?",
+  "Should animals be used in scientific research?",
+  "Do you think robots will take over most human jobs in the future?",
+  // 環境・科学
+  "What can individuals do to reduce climate change?",
+  "Should nuclear energy be used as an alternative to fossil fuels?",
+  "Is electric vehicle adoption important for a sustainable future?",
+  "Should people eat less meat for environmental reasons?",
+  "Do you think space exploration is worth the cost?",
+  "Should deforestation be made a global crime?",
+  "Is renewable energy the key to solving the energy crisis?",
+  "Should governments invest more in public transportation?",
+  "Do you think genetically modified food is safe?",
+  "Should more national parks be created to protect biodiversity?",
+  // 教育
+  "Is homework necessary for students' learning?",
+  "Should physical education be compulsory in schools?",
+  "Do you think online learning is as effective as in-person learning?",
+  "Should students be taught financial literacy in school?",
+  "Is it better to study abroad than to study in your home country?",
+  "Should arts and music education be given more importance in schools?",
+  "Do you think uniforms help improve school discipline?",
+  "Should coding be taught as a core subject in primary school?",
+  "Is learning history important for modern students?",
+  "Should students have a say in how their school is managed?",
+  // 健康・ライフスタイル
+  "Should fast food restaurants be required to display calorie counts?",
+  "Is regular exercise more important than diet for good health?",
+  "Should smoking be banned in all public places?",
+  "Do you think mental health education should be taught in schools?",
+  "Should the government provide free gym memberships to citizens?",
+  "Is it important to take vacations for mental wellbeing?",
+  "Should energy drinks be banned for people under 18?",
+  "Do you think vegetarian diets are healthier than diets with meat?",
+  "Should healthcare be available for free to everyone?",
+  "Is sleep more important than exercise for good health?",
+  // テクノロジー・AI
+  "Do you think artificial intelligence is more beneficial or harmful?",
+  "Should self-driving cars be allowed on public roads?",
+  "Is social media addiction a serious problem in modern society?",
+  "Should there be stricter regulations on the use of AI?",
+  "Do you think technology has made people less creative?",
+  "Should personal data collected by apps be regulated more strictly?",
+  "Is the internet a more positive or negative force in society?",
+  "Do you think video games can have educational benefits?",
+  "Should AI be used to make important medical decisions?",
+  "Is online privacy more important than national security?",
+  // 文化・グローバル
+  "Should English become the official global language?",
+  "Is globalization beneficial or harmful to local cultures?",
+  "Do you think cultural exchange programs are valuable?",
+  "Should countries accept more refugees?",
+  "Is it important to preserve traditional festivals and customs?",
+  "Do you think tourism can have negative effects on local communities?",
+  "Should more countries adopt a four-day workweek?",
+  "Is it important for young people to travel internationally?",
+  "Do you think immigration strengthens a country's economy?",
+  "Should countries impose tariffs to protect domestic industries?",
+  // 社会問題
+  "Should the death penalty be abolished worldwide?",
+  "Is it the government's responsibility to reduce poverty?",
+  "Do you think gender equality has been achieved in modern society?",
+  "Should wealthy countries give more aid to developing nations?",
+  "Is it important for celebrities to use their influence for social causes?",
+  "Do you think media violence affects people's behavior?",
+  "Should people be allowed to own guns?",
+  "Is community service a valuable way for young people to spend their time?",
+  "Do you think surveillance cameras in public places improve safety?",
+  "Should graffiti be considered art or vandalism?",
+  // 日本社会
+  "What are the biggest challenges facing Japan's aging society?",
+  "Should Japan accept more immigrants to solve its labor shortage?",
+  "Is the pressure on Japanese students to succeed in exams too great?",
+  "What can be done to improve work-life balance in Japan?",
+  "Do you think Japan should change its relationship with traditional gender roles?",
+  "Should Japan invest more in renewable energy?",
+  "Is manga and anime an important part of Japan's cultural identity?",
+  "What should Japan do to attract more foreign tourists?",
+  "Do you think regional cities in Japan are losing their appeal to young people?",
+  "Should Japanese companies allow employees more flexibility in where they work?",
+  // 哲学・価値観
+  "Is happiness more important than success?",
+  "Do you think money can buy happiness?",
+  "Is it better to be honest even if it hurts someone's feelings?",
+  "Do you believe that failure is necessary for personal growth?",
+  "Is competition beneficial or harmful to society?",
+  "Should people prioritize family over career?",
+  "Is it important to help strangers even at personal cost?",
+  "Do you think kindness is more important than intelligence?",
+  "Should children be raised with strict discipline or given more freedom?",
+  "Is it important for people to have a life purpose?",
+  // 追加トピック
+  "What is the most important quality a leader should have?",
+  "Should professional athletes be considered role models?",
+  "Is it better to specialize in one skill or develop many different abilities?",
+  "Do you think pets improve people's mental health?",
+  "Should museums be free for everyone?",
+  "Is it important for people to read books in the digital age?",
+  "Do you think public speaking skills are essential for modern careers?",
+  "Should celebrities' private lives be kept private from the media?",
+  "Is volunteering more valuable than donating money to charity?",
+  "What do you think is the greatest invention of the 20th century?",
+  "Should governments regulate the content young people see online?",
+  "Do you think people today are more stressed than previous generations?",
+  "Is it important to protect minority languages from disappearing?",
+  "Should countries spend more money on art and culture than on military defense?",
+  "Do you think children today have less freedom than previous generations?"
+];
+
+let currentTopic = '';
+
+function setRandomTopic() {
+  const idx = Math.floor(Math.random() * TOPICS.length);
+  currentTopic = TOPICS[idx];
+  const el = document.getElementById('topicDisplay');
+  el.textContent = currentTopic;
+  el.classList.remove('placeholder');
+  document.getElementById('customTopic').value = '';
+}
+
+function setCustomTopic(val) {
+  currentTopic = val;
+  const el = document.getElementById('topicDisplay');
+  if (val) {
+    el.textContent = val;
+    el.classList.remove('placeholder');
+  } else {
+    el.textContent = 'テーマを入力するか、ランダムボタンで出題してください';
+    el.classList.add('placeholder');
+  }
+}
+
+function updateWordCount() {
+  const text = document.getElementById('essay').value.trim();
+  const words = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
+  const limit = parseInt(document.getElementById('wordLimit').value) || 150;
+  const counter = document.getElementById('wordCounter');
+  counter.textContent = `${words} 語`;
+  counter.className = words > limit ? 'word-counter over' : 'word-counter';
+}
+
+function switchModel(level, btn) {
+  document.querySelectorAll('.model-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.model-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(`model-${level}`).classList.add('active');
+}
+
+function buildPrompt() {
+  const essay = document.getElementById('essay').value.trim();
+  const topic = currentTopic || '（テーマ未設定）';
+  const limit = document.getElementById('wordLimit').value;
+  return `あなたはプロの英語教師です。以下の英作文を厳密に添削してください。
+
+【テーマ】${topic}
+【目標語数】${limit}語
+【受験生の英作文】
+${essay}
+
+以下のJSON形式のみで回答してください（他の文字は一切不要）：
+{
+  "grammar_score": (0-35の整数),
+  "structure_score": (0-35の整数),
+  "logic_score": (0-30の整数),
+  "errors": [
+    {
+      "num": 1,
+      "wrong": "誤った表現",
+      "correct": "正しい表現",
+      "explanation": "なぜ誤りか・正しい理由の説明（日本語）"
+    }
+  ],
+  "advice": "アドバイスと講評（日本語、400字程度）",
+  "model_b1_en": "CEFR B1レベルのモデル英文（英語）",
+  "model_b1_ja": "モデル英文B1の日本語訳",
+  "model_b2_en": "CEFR B2レベルのモデル英文（英語）",
+  "model_b2_ja": "モデル英文B2の日本語訳"
+}
+文法ミスがない場合はerrorsを空配列にしてください。`;
+}
+
+// ★ Vercelデプロイ後にあなたのURLに書き換えてください
+// 例: const API_ENDPOINT = 'https://your-app.vercel.app/api/correct';
+const API_ENDPOINT = '/api/correct';
+
+async function submitEssay() {
+  const essay = document.getElementById('essay').value.trim();
+  if (!essay) { alert('英作文を入力してください。'); return; }
+  if (!currentTopic) { alert('テーマを設定してください。'); return; }
+
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('loading').classList.add('active');
+  document.getElementById('submitBtn').disabled = true;
+
+  try {
+    const prompt = buildPrompt();
+
+    const response = await fetch(API_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err?.error || 'サーバーエラーが発生しました');
+    }
+
+    const result = await response.json();
+    displayResults(result);
+  } catch (e) {
+    alert('添削中にエラーが発生しました。\n\n' + e.message);
+    console.error(e);
+  }
+
+  document.getElementById('loading').classList.remove('active');
+  document.getElementById('submitBtn').disabled = false;
+}
+
+function displayResults(r) {
+  // Scores
+  document.getElementById('totalScore').textContent = r.grammar_score + r.structure_score + r.logic_score;
+  document.getElementById('grammarScore').textContent = r.grammar_score;
+  document.getElementById('structureScore').textContent = r.structure_score;
+  document.getElementById('logicScore').textContent = r.logic_score;
+
+  setTimeout(() => {
+    document.getElementById('grammarBar').style.width = (r.grammar_score / 35 * 100) + '%';
+    document.getElementById('structureBar').style.width = (r.structure_score / 35 * 100) + '%';
+    document.getElementById('logicBar').style.width = (r.logic_score / 30 * 100) + '%';
+  }, 100);
+
+  // Errors
+  const errContainer = document.getElementById('grammarFeedback');
+  if (!r.errors || r.errors.length === 0) {
+    errContainer.innerHTML = '<div style="color:var(--green);font-weight:600;">✅ 文法・語法のミスは見当たりませんでした！</div>';
+  } else {
+    errContainer.innerHTML = r.errors.map(e => `
+      <div class="error-item">
+        <div class="err-num">【ミス ${e.num}】</div>
+        <span class="err-wrong">${escHtml(e.wrong)}</span>
+        <span class="err-arrow">→</span>
+        <span class="err-correct">${escHtml(e.correct)}</span>
+        <div class="err-explain">📌 ${escHtml(e.explanation)}</div>
+      </div>
+    `).join('');
+  }
+
+  // Advice
+  document.getElementById('adviceText').textContent = r.advice || '';
+
+  // Model answers
+  document.getElementById('modelB1En').textContent = r.model_b1_en || '';
+  document.getElementById('modelB1Ja').textContent = r.model_b1_ja || '';
+  document.getElementById('modelB2En').textContent = r.model_b2_en || '';
+  document.getElementById('modelB2Ja').textContent = r.model_b2_ja || '';
+
+  document.getElementById('results').classList.add('active');
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Word count on load
+updateWordCount();
+</script>
+</body>
+</html>
