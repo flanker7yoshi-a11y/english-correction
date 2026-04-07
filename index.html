@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>英作文添削アプリ</title>
+<title>英語演習A 英作文添削アプリ</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:wght@700;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -743,6 +743,31 @@ textarea#essay:focus {
 
 .btn-copy:hover { background: var(--gold-light); }
 
+.highlight-error {
+  background: #ffe0e0;
+  border-bottom: 2px solid var(--red);
+  border-radius: 3px;
+  padding: 1px 2px;
+  position: relative;
+  cursor: help;
+}
+
+.highlight-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--red);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin-left: 2px;
+  vertical-align: super;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
 @media (max-width: 600px) {
   .score-breakdown { grid-template-columns: 1fr; }
   .header-title { font-size: 1.2rem; }
@@ -753,7 +778,7 @@ textarea#essay:focus {
 <body>
 
 <header>
-  <div class="header-title">✍️ 英作文 添削アプリ</div>
+  <div class="header-title">✍️ 英語演習A 英作文添削アプリ</div>
 </header>
 
 <div class="container">
@@ -829,6 +854,17 @@ textarea#essay:focus {
           <div class="item-max">/ 30点</div>
           <div class="score-bar"><div class="score-bar-fill" id="logicBar" style="width:0%"></div></div>
         </div>
+      </div>
+    </div>
+
+    <!-- Highlighted Essay -->
+    <div class="feedback-section" id="highlightSection" style="display:none;">
+      <div class="fb-title">
+        <span class="fb-icon icon-grammar">🔍</span>
+        ① あなたの英文（訂正箇所をハイライト）
+      </div>
+      <div class="feedback-content">
+        <div id="highlightedEssay" style="font-family:'Lora',serif;font-size:1rem;line-height:2;padding:16px;background:#fffdf8;border-radius:8px;border:1px solid var(--border);white-space:pre-wrap;"></div>
       </div>
     </div>
 
@@ -1125,6 +1161,26 @@ function displayResults(r) {
     document.getElementById('structureBar').style.width = (r.structure_score / 35 * 100) + '%';
     document.getElementById('logicBar').style.width = (r.logic_score / 30 * 100) + '%';
   }, 100);
+
+  // Highlighted essay
+  const essay = document.getElementById('essay').value;
+  if (r.errors && r.errors.length > 0) {
+    let highlighted = escHtml(essay);
+    // Sort errors by length desc to avoid nested replace issues
+    const sorted = [...r.errors].sort((a, b) => b.wrong.length - a.wrong.length);
+    sorted.forEach(e => {
+      const escaped = escHtml(e.wrong);
+      // Replace only first occurrence
+      highlighted = highlighted.replace(
+        escaped,
+        `<span class="highlight-error">${escaped}<span class="highlight-num">${e.num}</span></span>`
+      );
+    });
+    document.getElementById('highlightedEssay').innerHTML = highlighted;
+    document.getElementById('highlightSection').style.display = 'block';
+  } else {
+    document.getElementById('highlightSection').style.display = 'none';
+  }
 
   // Errors
   const errContainer = document.getElementById('grammarFeedback');
